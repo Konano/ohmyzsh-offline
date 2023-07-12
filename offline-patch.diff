@@ -1,0 +1,48 @@
+diff --git a/tools/install.sh b/tools/install.sh
+index f7fbcf7..4e14374 100755
+--- a/tools/install.sh
++++ b/tools/install.sh
+@@ -281,39 +281,10 @@ setup_ohmyzsh() {
+   # that this will be ignored under Cygwin by default, as Windows ACLs take
+   # precedence over umasks except for filesystems mounted with option "noacl".
+   umask g-w,o-w
+
+-  echo "${FMT_BLUE}Cloning Oh My Zsh...${FMT_RESET}"
++  # Move the folder to $ZSH
++  cp -ra "$(dirname "$0")"/.. $ZSH
++  rm -rf $ZSH/.git
+
+-  command_exists git || {
+-    fmt_error "git is not installed"
+-    exit 1
+-  }
+-
+-  ostype=$(uname)
+-  if [ -z "${ostype%CYGWIN*}" ] && git --version | grep -Eq 'msysgit|windows'; then
+-    fmt_error "Windows/MSYS Git is not supported on Cygwin"
+-    fmt_error "Make sure the Cygwin git package is installed and is first on the \$PATH"
+-    exit 1
+-  fi
+-
+-  # Manual clone with git config options to support git < v1.7.2
+-  git init --quiet "$ZSH" && cd "$ZSH" \
+-  && git config core.eol lf \
+-  && git config core.autocrlf false \
+-  && git config fsck.zeroPaddedFilemode ignore \
+-  && git config fetch.fsck.zeroPaddedFilemode ignore \
+-  && git config receive.fsck.zeroPaddedFilemode ignore \
+-  && git config oh-my-zsh.remote origin \
+-  && git config oh-my-zsh.branch "$BRANCH" \
+-  && git remote add origin "$REMOTE" \
+-  && git fetch --depth=1 origin \
+-  && git checkout -b "$BRANCH" "origin/$BRANCH" || {
+-    [ ! -d "$ZSH" ] || {
+-      cd -
+-      rm -rf "$ZSH" 2>/dev/null
+-    }
+-    fmt_error "git clone of oh-my-zsh repo failed"
+-    exit 1
+-  }
+   # Exit installation directory
+   cd -
+ 
